@@ -72,6 +72,7 @@ export default function InfoTable({
 
   const handleInfoFormCancel = () => {
     setInfoFormModal(false);
+    setIsInfoFormSubmit(false);
   };
 
   const handleInfoFormOk = () => {

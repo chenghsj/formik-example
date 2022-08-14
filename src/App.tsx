@@ -40,7 +40,7 @@ function App() {
 
   const handleCancel = (setValues: (value: IData) => void) => {
     setValues(untouchedValues);
-    //TODO:
+    setIsInfoFormSubmit(false);
     dispatch(resetData({ rowId: initialValues.id, untouchedValues }));
   };
 
@@ -75,6 +75,7 @@ function App() {
           alert(JSON.stringify(values, null, 2));
           setIsInfoFormSubmit(false);
           dispatch(editNetAction({ rowId: initialValues.id, netData: values }));
+          setInit(false);
         }}
         component={(props: FormikProps<IData>) => {
           const { dirty, errors, touched, handleSubmit, setValues, setFieldValue } = props;
