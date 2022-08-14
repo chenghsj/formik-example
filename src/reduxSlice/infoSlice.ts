@@ -35,10 +35,23 @@ export const dataSlice = createSlice({
       const filteredRowIdx = filteredIdx(state, action.payload.rowId);
       const filteredInfoIdx = filteredIdx(state[filteredRowIdx].information, action.payload.infoId)
       state[filteredRowIdx].information.splice(filteredInfoIdx, 1)
-   }
+    },
+    editNetAction: (state, action: PayloadAction<{rowId: string, netData: IData}>) => {
+      const filteredRowIdx = filteredIdx(state, action.payload.rowId);
+      state[filteredRowIdx] = action.payload.netData;
+    },
+    resetData: (state, action: PayloadAction<{rowId: string, untouchedValues: IData}>) => {
+      const filteredRowIdx = filteredIdx(state, action.payload.rowId);
+      state[filteredRowIdx] = action.payload.untouchedValues;
+    },
   }
 });
 
-export const { editInfoAction, deleteInfoAction } = dataSlice.actions;
+export const {
+  editInfoAction,
+  deleteInfoAction,
+  editNetAction,
+  resetData
+} = dataSlice.actions;
 
 export default dataSlice.reducer;

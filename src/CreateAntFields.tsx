@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { Form, Input, Select, InputNumber } from "antd";
-import { FormikProps, FieldProps } from 'formik';
+import { FormikProps, FieldProps, FormikTouched, FormikErrors } from 'formik';
+import { IData, IInformation } from "./reduxSlice/infoSlice";
 
 type CreateAntFieldProps = {
-  // field: any;
-  // form: any;
   hasFeedback: boolean;
   label: string;
   type: string;
-  selectOptions: any;
-  style: any;
-} & FormikProps<any> & FieldProps;
+  selectOptions: any[];
+  style: React.CSSProperties;
+  selectedInfoIdx: number;
+} & FormikProps<IData | IInformation> & FieldProps;
 
 const CreateAntField = (AntComponent: any) => ({
   field,
@@ -20,10 +20,20 @@ const CreateAntField = (AntComponent: any) => ({
   type,
   selectOptions,
   style,
+  selectedInfoIdx,
   ...props
 }: CreateAntFieldProps) => {
-  const touched = form.touched[field.name];
-  const hasError = form.errors[field.name];
+  let touched: any;
+  let hasError: any;
+  // console.log(form, field.name.split('.')[1], selectedInfoIdx);
+  const fieldName = field.name.split('.')[1];
+  if (selectedInfoIdx >= 0 && form.touched.information && form.errors.information) {
+    touched = (form.touched.information as any)[selectedInfoIdx][fieldName];
+    hasError = (form.errors.information as any)[selectedInfoIdx][fieldName];
+  } else {
+    touched = form.touched[field.name] as FormikTouched<IData>;
+    hasError = form.errors[field.name] as FormikErrors<IData>;
+  }
   const touchedError = hasError && touched;
   const onInputChange = ({ target: { value } }: any) => {
     form.setFieldValue(field.name, value);

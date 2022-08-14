@@ -28,10 +28,8 @@ export default function NetFields({ }: Props) {
         name="domain_name"
         type="domain_name"
         label="Domain Name"
+        hasFeedback
       />
-      {/* <Modal>
-        <InfoFields />
-      </Modal> */}
     </React.Fragment>
   );
 }
