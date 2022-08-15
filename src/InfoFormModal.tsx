@@ -22,6 +22,7 @@ export function InfoFormModal({
     selectedInfoIdx,
     ...props
 }: IInfoFormModalProps) {
+    console.log(dirty, errors, touched);
     return (
         <Modal
             title={`${selectedInfoIdx < 0 ? "Add " : ""}Information`}

@@ -24,7 +24,8 @@ const validationSchema = yup.object({
   ip_address: yup.string().required("Required"),
   mac_address: yup.string().required("Required"),
   domain_name: yup.string().required("Required"),
-  information: yup.array(validationInfoSchema)
+  information: yup.array(validationInfoSchema),
+  newInfo: yup.object().shape(validationInfoSchema)
 });
 
 function App() {
@@ -43,10 +44,12 @@ function App() {
     setAddInfoInitialValues({} as IInformation);
     setAddInfoFomModalVisible(true);
     setEnableReinitialize(false);
-    formikRef.current.setFieldValue("age", null);
-    formikRef.current.setFieldValue("email", "");
-    formikRef.current.setFieldValue("first_name", "");
-    formikRef.current.setFieldValue("last_name", "");
+    formikRef.current.setFieldValue("newInfo", {
+      age: null,
+      email: "",
+      first_name: "",
+      last_name: "",
+    });
   };
 
   const handleAddInfoFormOk = (values: IInformation, setErrors: (values: any) => void) => () => {
@@ -59,8 +62,14 @@ function App() {
       last_name: values.last_name,
       id: uuid.v4()
     };
-    formikRef.current.setValues({ ...formikRef.current.values, information: selectedRowValues.information.concat(newInfo) });
-    setSelectedRowValues({ ...formikRef.current.values, information: selectedRowValues.information.concat(newInfo) });
+    formikRef.current.setValues({
+      ...formikRef.current.values,
+      information: selectedRowValues.information.concat(newInfo)
+    });
+    setSelectedRowValues({
+      ...formikRef.current.values,
+      information: selectedRowValues.information.concat(newInfo)
+    });
     setErrors({});
   };
 
@@ -111,8 +120,8 @@ function App() {
       <Formik
         innerRef={formikRef}
         enableReinitialize={enableReinitialize}
-        initialValues={addInfoFomModalVisible ? addInfoInitialValues : selectedRowValues}
-        validationSchema={addInfoFomModalVisible ? validationInfoSchema : validationSchema}
+        initialValues={addInfoFomModalVisible ? selectedRowValues.newInfo! : selectedRowValues}
+        validationSchema={addInfoFomModalVisible ? validationSchema.pick(['newInfo']) : validationSchema}
         onSubmit={(values) => {
           setEnableReinitialize(true);
           alert(JSON.stringify(values, null, 2));

@@ -16,6 +16,7 @@ export interface IData {
   domain_name: string;
   mac_address: string;
   information: IInformation[];
+  newInfo?: IInformation;
 }
 
 const initialState: IData[] = initialData;
