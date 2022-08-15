@@ -1,38 +1,31 @@
-import React, { useEffect, useLayoutEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { Table, Dropdown, Menu, Modal } from 'antd';
+import React, { useState } from 'react';
+import { Table, Dropdown, Menu } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { FormikProps } from 'formik';
-import * as yup from 'yup';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from './store';
-import { deleteInfoAction, editInfoAction, IData, IInformation } from './reduxSlice/infoSlice';
-import InfoFields from './formFields/InfoFields';
+import { IData, IInformation } from './reduxSlice/infoSlice';
 import { InfoFormModal } from './InfoFormModal';
 
 type Props = {
-  selectedRowNum: number;
-  setIsInfoFormSubmit: (bool: boolean) => void;
+  setEnableReinitialize: (bool: boolean) => void;
+  setSelectedRowValues: (values: IData) => void;
+  selectedRow: IData;
 } & FormikProps<IData | IInformation>;
 
 export default function InfoTable({
-  selectedRowNum,
   errors,
   dirty,
   touched,
   values,
-  setIsInfoFormSubmit,
+  setEnableReinitialize,
   handleSubmit,
   resetForm,
   setValues,
-  initialValues,
+  setSelectedRowValues,
+  selectedRow,
   ...props
 }: Props) {
-  const { data } = useSelector((state: RootState) => state);
-  const dispatch = useDispatch();
-  const selectedRow = data.find(el => el.row === selectedRowNum);
   const [infoFormModalVisible, setInfoFormModalVisible] = useState<boolean>(false);
   const [selectedInfoIdx, setSelectedInfoIdx] = useState<number>(-1);
-  const [selectedInfoId, setSelectedInfoId] = useState<string>("");
 
   const actionMenu = (record: IInformation, index: number) => {
     const actionMenuItems = [
@@ -64,31 +57,26 @@ export default function InfoTable({
   ];
 
   const handleEditClick = (record: IInformation, index: number) => () => {
-    setSelectedInfoId(record.id);
     setSelectedInfoIdx(index);
     setInfoFormModalVisible(true);
   };
 
   const handleDeleteClick = (record: IInformation) => () => {
-    // dispatch(deleteInfoAction({ rowId: selectedRow!.id, infoId: record.id }));
-    const newInfoArr = (values as IData).information.filter(info => info.id !== record.id)
-    setValues({...values!, information: newInfoArr})
+    const newInfoArr = (values as IData).information.filter(info => info.id !== record.id);
+    setValues({ ...values!, information: newInfoArr });
+    setSelectedRowValues({ ...selectedRow, information: newInfoArr });
+    setEnableReinitialize(false);
   };
 
   const handleInfoFormCancel = () => {
     setInfoFormModalVisible(false);
-    setIsInfoFormSubmit(false);
+    setEnableReinitialize(true);
     resetForm();
   };
 
   const handleInfoFormOk = () => {
     setInfoFormModalVisible(false);
-    setIsInfoFormSubmit(true);
-    // dispatch(editInfoAction({
-    //   rowId: selectedRow!.id,
-    //   infoId: selectedInfoId,
-    //   info: (values as IData).information[selectedInfoIdx]
-    // }));
+    setEnableReinitialize(false);
   };
 
   return (

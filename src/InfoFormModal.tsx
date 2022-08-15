@@ -1,6 +1,5 @@
-import { Modal } from 'antd';
 import * as React from 'react';
-import { FormikProps } from 'formik';
+import { Modal } from 'antd';
 import InfoFields from './formFields/InfoFields';
 
 export type IInfoFormModalProps = {
@@ -11,7 +10,7 @@ export type IInfoFormModalProps = {
     dirty: any;
     errors: any;
     touched: any;
-}
+};
 
 export function InfoFormModal({
     infoFormModalVisible,
@@ -35,5 +34,5 @@ export function InfoFormModal({
         >
             <InfoFields selectedInfoIdx={selectedInfoIdx} />
         </Modal>
-    )
+    );
 }

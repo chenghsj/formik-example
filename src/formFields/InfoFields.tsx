@@ -12,7 +12,7 @@ export default function InfoFields({ selectedInfoIdx }: Props) {
     email: selectedInfoIdx < 0 ? `email` : `information[${selectedInfoIdx}].email`,
     first_name: selectedInfoIdx < 0 ? `first_name` : `information[${selectedInfoIdx}].first_name`,
     last_name: selectedInfoIdx < 0 ? `last_name` : `information[${selectedInfoIdx}].last_name`
-  }
+  };
   return (
     <React.Fragment>
       <Field

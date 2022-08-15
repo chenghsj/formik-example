@@ -1,8 +1,6 @@
-import { Modal } from 'antd';
 import { Field } from 'formik';
 import React from 'react';
 import { AntInput } from '../CreateAntFields';
-import InfoFields from './InfoFields';
 
 type Props = {};
 
