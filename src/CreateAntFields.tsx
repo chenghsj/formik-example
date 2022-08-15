@@ -10,6 +10,8 @@ type CreateAntFieldProps = {
   selectOptions: any[];
   style: React.CSSProperties;
   selectedInfoIdx: number;
+  min: number;
+  max: number;
 } & FormikProps<IData | IInformation> & FieldProps;
 
 const CreateAntField = (AntComponent: any) => ({
@@ -21,19 +23,22 @@ const CreateAntField = (AntComponent: any) => ({
   selectOptions,
   style,
   selectedInfoIdx,
+  min,
+  max,
   ...props
 }: CreateAntFieldProps) => {
   let touched: any;
   let hasError: any;
-  // console.log(form, field.name.split('.')[1], selectedInfoIdx);
   const fieldName = field.name.split('.')[1];
+
   if (selectedInfoIdx >= 0 && form.touched.information && form.errors.information) {
     touched = (form.touched.information as any)[selectedInfoIdx][fieldName];
     hasError = (form.errors.information as any)[selectedInfoIdx][fieldName];
   } else {
-    touched = form.touched[field.name] as FormikTouched<IData>;
-    hasError = form.errors[field.name] as FormikErrors<IData>;
+    touched = form.touched[field.name] as FormikTouched<IData | IInformation>;
+    hasError = form.errors[field.name] as FormikErrors<IData  | IInformation>;
   }
+
   const touchedError = hasError && touched;
   const onInputChange = ({ target: { value } }: any) => {
     form.setFieldValue(field.name, value);
@@ -52,6 +57,8 @@ const CreateAntField = (AntComponent: any) => ({
         validateStatus={touchedError ? "error" : "success"}
       >
         <AntComponent
+          min={min}
+          max={max}
           style={style}
           suffix={<span />}
           {...field}

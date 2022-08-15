@@ -1,0 +1,39 @@
+import { Modal } from 'antd';
+import * as React from 'react';
+import { FormikProps } from 'formik';
+import InfoFields from './formFields/InfoFields';
+
+export type IInfoFormModalProps = {
+    infoFormModalVisible: boolean;
+    selectedInfoIdx: number;
+    handleInfoFormOk: () => void;
+    handleInfoFormCancel: () => void;
+    dirty: any;
+    errors: any;
+    touched: any;
+}
+
+export function InfoFormModal({
+    infoFormModalVisible,
+    dirty,
+    errors,
+    touched,
+    handleInfoFormOk,
+    handleInfoFormCancel,
+    selectedInfoIdx,
+    ...props
+}: IInfoFormModalProps) {
+    return (
+        <Modal
+            title={`${selectedInfoIdx < 0 ? "Add " : ""}Information`}
+            visible={infoFormModalVisible}
+            okButtonProps={{
+                disabled: !dirty || Object.keys(errors).length > 0 || !touched
+            }}
+            onOk={handleInfoFormOk}
+            onCancel={handleInfoFormCancel}
+        >
+            <InfoFields selectedInfoIdx={selectedInfoIdx} />
+        </Modal>
+    )
+}

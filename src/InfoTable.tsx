@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from 'react';
+import React, { useEffect, useLayoutEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Table, Dropdown, Menu, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { FormikProps } from 'formik';
@@ -7,11 +7,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store';
 import { deleteInfoAction, editInfoAction, IData, IInformation } from './reduxSlice/infoSlice';
 import InfoFields from './formFields/InfoFields';
+import { InfoFormModal } from './InfoFormModal';
 
 type Props = {
   selectedRowNum: number;
   setIsInfoFormSubmit: (bool: boolean) => void;
-} & FormikProps<IData>;
+} & FormikProps<IData | IInformation>;
 
 export default function InfoTable({
   selectedRowNum,
@@ -21,20 +22,22 @@ export default function InfoTable({
   values,
   setIsInfoFormSubmit,
   handleSubmit,
-  ...pops
+  resetForm,
+  setValues,
+  initialValues,
+  ...props
 }: Props) {
   const { data } = useSelector((state: RootState) => state);
   const dispatch = useDispatch();
   const selectedRow = data.find(el => el.row === selectedRowNum);
-  const [infoFormModal, setInfoFormModal] = useState<boolean>(false);
-  // const [initialInfoFormValues, setInitialInfoFormValues] = useState<IInformation>({} as IInformation);
+  const [infoFormModalVisible, setInfoFormModalVisible] = useState<boolean>(false);
   const [selectedInfoIdx, setSelectedInfoIdx] = useState<number>(-1);
   const [selectedInfoId, setSelectedInfoId] = useState<string>("");
 
   const actionMenu = (record: IInformation, index: number) => {
     const actionMenuItems = [
-      { key: "edit", label: "Edit", onClick: () => handleEditClick(record, index) },
-      { key: "delete", label: "Delete", onClick: () => handleDeleteClick(record) }
+      { key: "edit", label: "Edit", onClick: handleEditClick(record, index) },
+      { key: "delete", label: "Delete", onClick: handleDeleteClick(record) }
     ];
     return <Menu items={actionMenuItems} />;
   };
@@ -60,46 +63,50 @@ export default function InfoTable({
     }
   ];
 
-  const handleEditClick = (record: IInformation, index: number) => {
+  const handleEditClick = (record: IInformation, index: number) => () => {
     setSelectedInfoId(record.id);
     setSelectedInfoIdx(index);
-    setInfoFormModal(true);
+    setInfoFormModalVisible(true);
   };
 
-  const handleDeleteClick = (record: IInformation) => {
-    dispatch(deleteInfoAction({ rowId: selectedRow!.id, infoId: record.id }));
+  const handleDeleteClick = (record: IInformation) => () => {
+    // dispatch(deleteInfoAction({ rowId: selectedRow!.id, infoId: record.id }));
+    const newInfoArr = (values as IData).information.filter(info => info.id !== record.id)
+    setValues({...values!, information: newInfoArr})
   };
 
   const handleInfoFormCancel = () => {
-    setInfoFormModal(false);
+    setInfoFormModalVisible(false);
     setIsInfoFormSubmit(false);
+    resetForm();
   };
 
   const handleInfoFormOk = () => {
-    setInfoFormModal(false);
+    setInfoFormModalVisible(false);
     setIsInfoFormSubmit(true);
-    dispatch(editInfoAction({ rowId: selectedRow!.id, infoId: selectedInfoId, info: values.information[selectedInfoIdx] }));
+    // dispatch(editInfoAction({
+    //   rowId: selectedRow!.id,
+    //   infoId: selectedInfoId,
+    //   info: (values as IData).information[selectedInfoIdx]
+    // }));
   };
 
   return (
-    <>
+    <React.Fragment>
       <Table
-        dataSource={selectedRow?.information}
+        dataSource={(values as IData).information}
         rowKey={(record: IInformation) => record.id}
         columns={columns}
       />
-      <Modal
-        title="Information"
-        visible={infoFormModal}
-        okButtonProps={{
-          disabled: !dirty || Object.keys(errors).length > 0 || !touched
-        }}
-        onOk={handleInfoFormOk}
-        onCancel={handleInfoFormCancel}
-      >
-        <InfoFields selectedInfoIdx={selectedInfoIdx} />
-      </Modal>
-    </>
-
+      <InfoFormModal
+        selectedInfoIdx={selectedInfoIdx}
+        infoFormModalVisible={infoFormModalVisible}
+        handleInfoFormOk={handleInfoFormOk}
+        handleInfoFormCancel={handleInfoFormCancel}
+        dirty={dirty}
+        errors={errors}
+        touched={touched}
+      />
+    </React.Fragment>
   );
 }
