@@ -72,7 +72,7 @@ export default function InfoTable({
 
   const handleInfoFormCancel = () => {
     setInfoFormModalVisible(false);
-    // setEnableReinitialize(true);
+    setEnableReinitialize(true);
   };
 
   const handleInfoFormOk = () => {

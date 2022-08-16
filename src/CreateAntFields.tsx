@@ -34,12 +34,9 @@ const CreateAntField = (AntComponent: any) => ({
   if (selectedInfoIdx >= 0 && form.touched.information && form.errors.information) {
     touched = (form.touched.information as any)[selectedInfoIdx][fieldName];
     hasError = (form.errors.information as any)[selectedInfoIdx][fieldName];
-  } else if (selectedInfoIdx < 0) {
-    touched = (form.touched.newInfo as any)?.[fieldName];
-    hasError = (form.errors.newInfo as any)?.[fieldName];
   } else {
-    touched = form.touched[field.name] as FormikTouched<IData | IInformation>;
-    hasError = form.errors[field.name] as FormikErrors<IData | IInformation>;
+    touched = form.touched[field.name];
+    hasError = form.errors[field.name];
   }
 
   const touchedError = hasError && touched;

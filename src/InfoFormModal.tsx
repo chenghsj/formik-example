@@ -25,10 +25,10 @@ export function InfoFormModal({
     values,
     ...props
 }: IInfoFormModalProps) {
-    let hasEmptyValue: boolean = false;
-    if (values.newInfo && Object.keys(values.newInfo).length === 0) hasEmptyValue = true
-    const disabledOkButton = !dirty || Object.keys(errors).length > 0 || !touched || hasEmptyValue
-    
+    // let hasEmptyValue: boolean = false;
+    // if (values.newInfo && Object.keys(values.newInfo).length === 0) hasEmptyValue = true
+    const disabledOkButton = !dirty || Object.keys(errors).length > 0 || !touched
+    // console.log(values, dirty, errors, touched);
     return (
         <Modal
             title={`${selectedInfoIdx < 0 ? "Add " : ""}Information`}

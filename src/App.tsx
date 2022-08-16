@@ -5,14 +5,13 @@ import { RootState } from './store';
 import { Formik, Form, FormikProps, FormikState } from 'formik';
 import * as yup from 'yup';
 import { updateRowDataAction, IData, IInformation } from './reduxSlice/dataSlice';
-import * as uuid from 'uuid';
 import './App.css';
 import InfoTable from './InfoTable';
 import NetFields from './formFields/NetFields';
 import { useDispatch } from 'react-redux';
-import { InfoFormModal } from './InfoFormModal';
+import { NewInfoForm } from './components/NewInfoForm';
 
-const validationInfoSchema = yup.object({
+export const validationInfoSchema = yup.object({
   age: yup.number().required("Required"),
   email: yup.string().email("Email must be a valid").required("Required"),
   first_name: yup.string().required("Required"),
@@ -37,28 +36,11 @@ function App() {
   const [untouchedValuesFlag, setUntouchedValuesFlag] = useState(false);
   const [addInfoFomModalVisible, setAddInfoFomModalVisible] = useState(false);
   const formikRef = useRef<any>(null);
+  const newInfoRef = useRef<any>(null);
 
   const handleAddInfoBtnClick = () => {
     setAddInfoFomModalVisible(true);
-    formikRef.current.setFieldValue("newInfo", {} as IInformation);
-  };
-
-  const handleAddInfoFormOk = (values: IData, setErrors: (values: any) => void) => () => {
-    setAddInfoFomModalVisible(false);
-    const newInfo: IInformation = { ...values.newInfo!, id: uuid.v4() };
-    formikRef.current.setValues({
-      ...formikRef.current.values,
-      information: selectedRowValues.information.concat(newInfo)
-    });
-    setSelectedRowValues({
-      ...formikRef.current.values,
-      information: selectedRowValues.information.concat(newInfo)
-    });
-    setEnableReinitialize(false);
-  };
-
-  const handleAddInfoFormCancel = (setErrors: (values: any) => void) => () => {
-    setAddInfoFomModalVisible(false);
+    newInfoRef.current.resetForm();
   };
 
   const handleSelectChange = (value: number) => {
@@ -102,7 +84,7 @@ function App() {
         innerRef={formikRef}
         enableReinitialize={enableReinitialize}
         initialValues={selectedRowValues}
-        validationSchema={addInfoFomModalVisible ? validationSchema.pick(['newInfo']) : validationSchema.omit(['newInfo'])}
+        validationSchema={validationSchema.omit(['newInfo'])}
         onSubmit={(values) => {
           setEnableReinitialize(true);
           alert(JSON.stringify(values, null, 2));
@@ -118,7 +100,7 @@ function App() {
           }
           const disabledApplyBtn = !dirty || !touched || hasEmptyValue
             || (Object.keys(errors).length > 0 && Object.keys(formikRef.current?.errors).length > 0);
-            
+
           return (
             <>
               <Form
@@ -132,13 +114,6 @@ function App() {
                     Add
                   </Button>
                 </Row>
-                <InfoFormModal
-                  selectedInfoIdx={-1}
-                  infoFormModalVisible={addInfoFomModalVisible}
-                  handleInfoFormOk={handleAddInfoFormOk(values as IData, setErrors)}
-                  handleInfoFormCancel={handleAddInfoFormCancel(setErrors)}
-                  {...props}
-                />
                 <InfoTable
                   selectedRow={selectedRowValues}
                   setSelectedRowValues={setSelectedRowValues}
@@ -166,6 +141,16 @@ function App() {
         }}
       >
       </Formik>
+      <NewInfoForm
+        setAddInfoFomModalVisible={setAddInfoFomModalVisible}
+        newInfoRef={newInfoRef}
+        formikRef={formikRef}
+        selectedRowValues={selectedRowValues}
+        enableReinitialize={enableReinitialize}
+        addInfoFomModalVisible={addInfoFomModalVisible}
+        setSelectedRowValues={setSelectedRowValues}
+        setEnableReinitialize={setEnableReinitialize}
+      />
     </div >
   );
 }
