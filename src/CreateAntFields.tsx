@@ -48,6 +48,7 @@ const CreateAntField = (AntComponent: any) => ({
   };
 
   const onBlur = () => form.setFieldTouched(field.name, true);
+
   return (
     <div className="field-container">
       <Form.Item

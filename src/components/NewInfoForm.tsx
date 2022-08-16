@@ -1,63 +1,50 @@
 import { Formik, FormikProps } from 'formik';
+import { useRef } from 'react';
 import * as uuid from 'uuid';
-import { validationInfoSchema } from '../App';
 import { InfoFormModal } from '../InfoFormModal';
-import { IData, IInformation } from '../reduxSlice/dataSlice';
+import { IInformation } from '../reduxSlice/dataSlice';
+import { validationInfoSchema } from '../validationSchema/validationSchema';
 
 export interface INewInfoFormProps {
-    newInfoRef: any;
     formikRef: any;
-    selectedRowValues: IData;
+    newInfoRef: any;
     enableReinitialize: boolean;
     addInfoFomModalVisible: boolean;
     setAddInfoFomModalVisible: (bool: boolean) => void;
-    setSelectedRowValues: (values: IData) => void;
-    setEnableReinitialize: (bool: boolean) => void
+    setEnableReinitialize: (bool: boolean) => void;
 }
 
 export function NewInfoForm({
+    formikRef,
     newInfoRef,
     enableReinitialize,
     addInfoFomModalVisible,
     setAddInfoFomModalVisible,
-    formikRef,
-    selectedRowValues,
-    setSelectedRowValues,
     setEnableReinitialize,
     ...props
 }: INewInfoFormProps) {
     const handleAddInfoFormOk = (values: IInformation) => () => {
-        console.log(values);
         setAddInfoFomModalVisible(false);
         const newInfo: IInformation = { ...values, id: uuid.v4() };
         formikRef.current.setValues({
             ...formikRef.current.values,
-            information: selectedRowValues.information.concat(newInfo)
-        });
-        setSelectedRowValues({
-            ...formikRef.current.values,
-            information: selectedRowValues.information.concat(newInfo)
+            information: formikRef.current.values.information.concat(newInfo)
         });
         setEnableReinitialize(false);
     };
 
     const handleAddInfoFormCancel = () => {
         setAddInfoFomModalVisible(false);
+        newInfoRef.current.resetForm();
     };
 
     return (
         <Formik
             innerRef={newInfoRef}
             enableReinitialize={enableReinitialize}
-            initialValues={{
-                id: "",
-                age: 7,
-                email: "",
-                first_name: "",
-                last_name: ""
-            }}
+            initialValues={{} as IInformation}
             validationSchema={validationInfoSchema}
-            onSubmit={(values) => { }}
+            onSubmit={() => { }}
             component={(props: FormikProps<IInformation>) => {
                 const { values } = props;
                 return (
@@ -68,7 +55,7 @@ export function NewInfoForm({
                         handleInfoFormCancel={handleAddInfoFormCancel}
                         {...props}
                     />
-                )
+                );
             }}
         />
     );

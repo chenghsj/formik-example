@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table, Dropdown, Menu } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { FormikProps } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import { IData, IInformation } from './reduxSlice/dataSlice';
 import { InfoFormModal } from './InfoFormModal';
+import { validationSchema } from './validationSchema/validationSchema';
+
 
 type Props = {
   setEnableReinitialize: (bool: boolean) => void;
-  setSelectedRowValues: (values: IData) => void;
-  selectedRow: IData;
 } & FormikProps<IData>;
 
 export default function InfoTable({
@@ -16,17 +16,16 @@ export default function InfoTable({
   dirty,
   touched,
   values,
-  setEnableReinitialize,
   handleSubmit,
   resetForm,
   setValues,
-  setSelectedRowValues,
-  selectedRow,
+  setEnableReinitialize,
   ...props
 }: Props) {
   const [infoFormModalVisible, setInfoFormModalVisible] = useState<boolean>(false);
-  const [selectedInfoIdx, setSelectedInfoIdx] = useState<number>(-1);
-
+  const [selectedInfoIdx, setSelectedInfoIdx] = useState<number>(0);
+  const editInfoRef = useRef<any>(null);
+  console.log(values);
   const actionMenu = (record: IInformation, index: number) => {
     const actionMenuItems = [
       { key: "edit", label: "Edit", onClick: handleEditClick(record, index) },
@@ -57,27 +56,26 @@ export default function InfoTable({
   ];
 
   const handleEditClick = (record: IInformation, index: number) => () => {
-    setSelectedInfoIdx(index);
+    console.log('clicked');
     setInfoFormModalVisible(true);
+    setEnableReinitialize(false);
+    setSelectedInfoIdx(index);
   };
 
   const handleDeleteClick = (record: IInformation) => () => {
-    const newInfoArr = (values as IData).information.filter(info => info.id !== record.id);
-    const newValues = { ...values!, information: newInfoArr, newInfo: {} as IInformation } as IData;
-    // delete newValues.newInfo;
+    const newInfoArr = values.information.filter(info => info.id !== record.id);
+    const newValues = { ...values!, information: newInfoArr };
     setValues(newValues);
-    setSelectedRowValues(newValues);
-    setEnableReinitialize(false);
   };
 
   const handleInfoFormCancel = () => {
     setInfoFormModalVisible(false);
-    setEnableReinitialize(true);
+    editInfoRef.current.setValues(values);
   };
 
   const handleInfoFormOk = () => {
     setInfoFormModalVisible(false);
-    setEnableReinitialize(false);
+    setValues(editInfoRef.current.values);
   };
 
   return (
@@ -87,16 +85,25 @@ export default function InfoTable({
         rowKey={(record: IInformation) => record.id}
         columns={columns}
       />
-      <InfoFormModal
-        values={values}
-        selectedInfoIdx={selectedInfoIdx}
-        infoFormModalVisible={infoFormModalVisible}
-        handleInfoFormOk={handleInfoFormOk}
-        handleInfoFormCancel={handleInfoFormCancel}
-        dirty={dirty}
-        errors={errors}
-        touched={touched}
+      <Formik
+        innerRef={editInfoRef}
+        enableReinitialize
+        initialValues={values}
+        validationSchema={validationSchema.pick(['information'])}
+        onSubmit={() => { }}
+        component={(props: FormikProps<IData>) => {
+          return (
+            <InfoFormModal
+              selectedInfoIdx={selectedInfoIdx}
+              infoFormModalVisible={infoFormModalVisible}
+              handleInfoFormOk={handleInfoFormOk}
+              handleInfoFormCancel={handleInfoFormCancel}
+              {...props}
+            />
+          );
+        }}
       />
+
     </React.Fragment>
   );
 }

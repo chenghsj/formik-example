@@ -1,37 +1,31 @@
 import * as React from 'react';
 import { Modal } from 'antd';
 import InfoFields from './formFields/InfoFields';
-import { IData, IInformation } from './reduxSlice/dataSlice';
+import { FormikProps } from 'formik';
 
 export type IInfoFormModalProps = {
-    dirty: any;
-    errors: any;
-    touched: any;
-    values: any;
     infoFormModalVisible: boolean;
     selectedInfoIdx: number;
     handleInfoFormOk: () => void;
     handleInfoFormCancel: () => void;
-};
+} & FormikProps<any>;
 
 export function InfoFormModal({
-    infoFormModalVisible,
+    values,
     dirty,
     errors,
     touched,
     handleInfoFormOk,
     handleInfoFormCancel,
+    infoFormModalVisible,
     selectedInfoIdx,
-    values,
     ...props
 }: IInfoFormModalProps) {
-    // let hasEmptyValue: boolean = false;
-    // if (values.newInfo && Object.keys(values.newInfo).length === 0) hasEmptyValue = true
-    const disabledOkButton = !dirty || Object.keys(errors).length > 0 || !touched
-    // console.log(values, dirty, errors, touched);
+    const disabledOkButton = !dirty || Object.keys(errors).length > 0;
+    console.log(selectedInfoIdx);
     return (
         <Modal
-            title={`${selectedInfoIdx < 0 ? "Add " : ""}Information`}
+            title={`${selectedInfoIdx < 0 ? "Add " : "Edit "}Information`}
             visible={infoFormModalVisible}
             okButtonProps={{
                 disabled: disabledOkButton

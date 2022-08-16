@@ -16,7 +16,6 @@ export interface IData {
   domain_name: string;
   mac_address: string;
   information: IInformation[];
-  newInfo?: IInformation;
 }
 
 const initialState: IData[] = initialData;
@@ -27,38 +26,15 @@ export const dataSlice = createSlice({
   name: "data",
   initialState,
   reducers: {
-    editInfoAction: (state, action: PayloadAction<{ rowId: string, infoId: string, info: IInformation; }>) => {
-      const filteredRowIdx = filteredIdx(state, action.payload.rowId)
-      const filteredInfoIdx = filteredIdx(state[filteredRowIdx].information, action.payload.infoId)
-      state[filteredRowIdx].information[filteredInfoIdx] = action.payload.info;
-    },
-    deleteInfoAction: (state, action: PayloadAction<{ rowId: string, infoId: string }>) => {
-      const filteredRowIdx = filteredIdx(state, action.payload.rowId);
-      const filteredInfoIdx = filteredIdx(state[filteredRowIdx].information, action.payload.infoId)
-      state[filteredRowIdx].information.splice(filteredInfoIdx, 1)
-    },
     updateRowDataAction: (state, action: PayloadAction<{ rowId: string, rowData: IData }>) => {
       const filteredRowIdx = filteredIdx(state, action.payload.rowId);
       state[filteredRowIdx] = action.payload.rowData;
-      delete state[filteredRowIdx].newInfo;
-    },
-    resetData: (state, action: PayloadAction<{ rowId: string, untouchedValues: IData }>) => {
-      const filteredRowIdx = filteredIdx(state, action.payload.rowId);
-      state[filteredRowIdx] = action.payload.untouchedValues;
-    },
-    addInfoAction: (state, action: PayloadAction<{ rowId: string, newInfo: IInformation }>) => {
-      const filteredRowIdx = filteredIdx(state, action.payload.rowId);
-      state[filteredRowIdx].information.push(action.payload.newInfo);
     },
   }
 });
 
 export const {
-  editInfoAction,
-  deleteInfoAction,
   updateRowDataAction,
-  resetData,
-  addInfoAction
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
