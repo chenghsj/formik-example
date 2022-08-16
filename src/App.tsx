@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Table, Select, Button, Row, Modal } from 'antd';
+import { Select, Button, Row } from 'antd';
 import { RootState } from './store';
-import { Formik, Form, FormikProps } from 'formik';
+import { Formik, Form, FormikProps, FormikState } from 'formik';
 import * as yup from 'yup';
-import cloneDeep from 'lodash/cloneDeep';
-import { updateRowDataAction, IData, IInformation } from './reduxSlice/infoSlice';
+import { updateRowDataAction, IData, IInformation } from './reduxSlice/dataSlice';
 import * as uuid from 'uuid';
 import './App.css';
 import InfoTable from './InfoTable';
@@ -25,7 +24,7 @@ const validationSchema = yup.object({
   mac_address: yup.string().required("Required"),
   domain_name: yup.string().required("Required"),
   information: yup.array(validationInfoSchema),
-  newInfo: yup.object().shape(validationInfoSchema)
+  newInfo: validationInfoSchema
 });
 
 function App() {
@@ -33,35 +32,20 @@ function App() {
   const dispatch = useDispatch();
   const [selectedRowNum, setSelectedRowNum] = useState(1);
   const [selectedRowValues, setSelectedRowValues] = useState({} as IData);
-  const [addInfoInitialValues, setAddInfoInitialValues] = useState({} as IInformation);
   const [enableReinitialize, setEnableReinitialize] = useState(true);
   const [untouchedValues, setUntouchedValues] = useState({} as IData);
   const [untouchedValuesFlag, setUntouchedValuesFlag] = useState(false);
   const [addInfoFomModalVisible, setAddInfoFomModalVisible] = useState(false);
   const formikRef = useRef<any>(null);
 
-  const handleAddInfoClick = () => {
-    setAddInfoInitialValues({} as IInformation);
+  const handleAddInfoBtnClick = () => {
     setAddInfoFomModalVisible(true);
-    setEnableReinitialize(false);
-    formikRef.current.setFieldValue("newInfo", {
-      age: null,
-      email: "",
-      first_name: "",
-      last_name: "",
-    });
+    formikRef.current.setFieldValue("newInfo", {} as IInformation);
   };
 
-  const handleAddInfoFormOk = (values: IInformation, setErrors: (values: any) => void) => () => {
+  const handleAddInfoFormOk = (values: IData, setErrors: (values: any) => void) => () => {
     setAddInfoFomModalVisible(false);
-    setAddInfoInitialValues(values);
-    const newInfo: IInformation = {
-      age: values.age,
-      email: values.email,
-      first_name: values.first_name,
-      last_name: values.last_name,
-      id: uuid.v4()
-    };
+    const newInfo: IInformation = { ...values.newInfo!, id: uuid.v4() };
     formikRef.current.setValues({
       ...formikRef.current.values,
       information: selectedRowValues.information.concat(newInfo)
@@ -70,13 +54,11 @@ function App() {
       ...formikRef.current.values,
       information: selectedRowValues.information.concat(newInfo)
     });
-    setErrors({});
+    setEnableReinitialize(false);
   };
 
   const handleAddInfoFormCancel = (setErrors: (values: any) => void) => () => {
     setAddInfoFomModalVisible(false);
-    formikRef.current.setErrors({});
-    setErrors({});
   };
 
   const handleSelectChange = (value: number) => {
@@ -94,10 +76,9 @@ function App() {
 
   useEffect(() => {
     const rowData = data.find(el => el.row === selectedRowNum)!;
-    setSelectedRowValues(rowData);
+    formikRef.current.resetForm({ ...rowData, newInfo: {} as IInformation });
+    setSelectedRowValues({ ...rowData, newInfo: {} as IInformation });
     setUntouchedValuesFlag(true);
-    formikRef.current.setValues(rowData);
-    formikRef.current.resetForm(rowData);
   }, [data, selectedRowNum]);
 
   useEffect(() => {
@@ -120,16 +101,24 @@ function App() {
       <Formik
         innerRef={formikRef}
         enableReinitialize={enableReinitialize}
-        initialValues={addInfoFomModalVisible ? selectedRowValues.newInfo! : selectedRowValues}
-        validationSchema={addInfoFomModalVisible ? validationSchema.pick(['newInfo']) : validationSchema}
+        initialValues={selectedRowValues}
+        validationSchema={addInfoFomModalVisible ? validationSchema.pick(['newInfo']) : validationSchema.omit(['newInfo'])}
         onSubmit={(values) => {
           setEnableReinitialize(true);
           alert(JSON.stringify(values, null, 2));
           dispatch(updateRowDataAction({ rowId: selectedRowValues.id, rowData: values as IData }));
           setUntouchedValuesFlag(false);
         }}
-        component={(props: FormikProps<IData | IInformation>) => {
+        component={(props: FormikProps<IData>) => {
           const { dirty, touched, handleSubmit, setValues, setErrors, values, errors } = props;
+          let hasEmptyValue = false;
+          let key: keyof typeof values;
+          for (key in values) {
+            if (values[key] === "") hasEmptyValue = true
+          }
+          const disabledApplyBtn = !dirty || !touched || hasEmptyValue
+            || (Object.keys(errors).length > 0 && Object.keys(formikRef.current?.errors).length > 0);
+            
           return (
             <>
               <Form
@@ -138,7 +127,7 @@ function App() {
                 <NetFields />
                 <Row justify='end'>
                   <Button
-                    onClick={handleAddInfoClick}
+                    onClick={handleAddInfoBtnClick}
                   >
                     Add
                   </Button>
@@ -146,7 +135,7 @@ function App() {
                 <InfoFormModal
                   selectedInfoIdx={-1}
                   infoFormModalVisible={addInfoFomModalVisible}
-                  handleInfoFormOk={handleAddInfoFormOk(values as IInformation, setErrors)}
+                  handleInfoFormOk={handleAddInfoFormOk(values as IData, setErrors)}
                   handleInfoFormCancel={handleAddInfoFormCancel(setErrors)}
                   {...props}
                 />
@@ -161,13 +150,11 @@ function App() {
                     style={{ marginRight: "10px" }}
                     onClick={handleCancel(setValues)}
                   >
-                    Cancel
+                    Reset
                   </Button>
                   <Button
                     type="primary"
-                    disabled={!dirty
-                      || (Object.keys(formikRef.current?.errors).length > 0 && Object.keys(errors).length > 0)
-                      || !touched}
+                    disabled={disabledApplyBtn}
                     htmlType="submit"
                   >
                     Apply
@@ -175,7 +162,6 @@ function App() {
                 </Row>
               </Form>
             </>
-
           );
         }}
       >

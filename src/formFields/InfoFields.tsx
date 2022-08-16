@@ -19,7 +19,6 @@ export default function InfoFields({ selectedInfoIdx }: Props) {
         component={AntInputNumber}
         name={fieldName.age}
         label="Age"
-        hasFeedback
         selectedInfoIdx={selectedInfoIdx}
         min={7}
         max={90}
@@ -29,7 +28,6 @@ export default function InfoFields({ selectedInfoIdx }: Props) {
         name={fieldName.email}
         type="email"
         label="Email"
-        hasFeedback
         selectedInfoIdx={selectedInfoIdx}
       />
       <Field

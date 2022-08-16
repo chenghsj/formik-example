@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Input, Select, InputNumber } from "antd";
 import { FormikProps, FieldProps, FormikTouched, FormikErrors } from 'formik';
-import { IData, IInformation } from "./reduxSlice/infoSlice";
+import { IData, IInformation } from "./reduxSlice/dataSlice";
 
 type CreateAntFieldProps = {
   hasFeedback: boolean;
@@ -36,7 +36,7 @@ const CreateAntField = (AntComponent: any) => ({
     hasError = (form.errors.information as any)[selectedInfoIdx][fieldName];
   } else if (selectedInfoIdx < 0) {
     touched = (form.touched.newInfo as any)?.[fieldName];
-    hasError = (form.errors.newInfo as any)?.validationInfoSchema?.[fieldName];
+    hasError = (form.errors.newInfo as any)?.[fieldName];
   } else {
     touched = form.touched[field.name] as FormikTouched<IData | IInformation>;
     hasError = form.errors[field.name] as FormikErrors<IData | IInformation>;

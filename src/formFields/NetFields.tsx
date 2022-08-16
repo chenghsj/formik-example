@@ -12,21 +12,18 @@ export default function NetFields({ }: Props) {
         name="ip_address"
         type="ip_address"
         label="IP Address"
-        hasFeedback
       />
       <Field
         component={AntInput}
         name="mac_address"
         type="mac_address"
         label="MAC Address"
-        hasFeedback
       />
       <Field
         component={AntInput}
         name="domain_name"
         type="domain_name"
         label="Domain Name"
-        hasFeedback
       />
     </React.Fragment>
   );

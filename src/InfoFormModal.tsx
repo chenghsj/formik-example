@@ -1,15 +1,17 @@
 import * as React from 'react';
 import { Modal } from 'antd';
 import InfoFields from './formFields/InfoFields';
+import { IData, IInformation } from './reduxSlice/dataSlice';
 
 export type IInfoFormModalProps = {
+    dirty: any;
+    errors: any;
+    touched: any;
+    values: any;
     infoFormModalVisible: boolean;
     selectedInfoIdx: number;
     handleInfoFormOk: () => void;
     handleInfoFormCancel: () => void;
-    dirty: any;
-    errors: any;
-    touched: any;
 };
 
 export function InfoFormModal({
@@ -20,15 +22,19 @@ export function InfoFormModal({
     handleInfoFormOk,
     handleInfoFormCancel,
     selectedInfoIdx,
+    values,
     ...props
 }: IInfoFormModalProps) {
-    console.log(dirty, errors, touched);
+    let hasEmptyValue: boolean = false;
+    if (values.newInfo && Object.keys(values.newInfo).length === 0) hasEmptyValue = true
+    const disabledOkButton = !dirty || Object.keys(errors).length > 0 || !touched || hasEmptyValue
+    
     return (
         <Modal
             title={`${selectedInfoIdx < 0 ? "Add " : ""}Information`}
             visible={infoFormModalVisible}
             okButtonProps={{
-                disabled: !dirty || Object.keys(errors).length > 0 || !touched
+                disabled: disabledOkButton
             }}
             onOk={handleInfoFormOk}
             onCancel={handleInfoFormCancel}

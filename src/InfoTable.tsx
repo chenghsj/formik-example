@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Table, Dropdown, Menu } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { FormikProps } from 'formik';
-import { IData, IInformation } from './reduxSlice/infoSlice';
+import { IData, IInformation } from './reduxSlice/dataSlice';
 import { InfoFormModal } from './InfoFormModal';
 
 type Props = {
   setEnableReinitialize: (bool: boolean) => void;
   setSelectedRowValues: (values: IData) => void;
   selectedRow: IData;
-} & FormikProps<IData | IInformation>;
+} & FormikProps<IData>;
 
 export default function InfoTable({
   errors,
@@ -63,15 +63,16 @@ export default function InfoTable({
 
   const handleDeleteClick = (record: IInformation) => () => {
     const newInfoArr = (values as IData).information.filter(info => info.id !== record.id);
-    setValues({ ...values!, information: newInfoArr });
-    setSelectedRowValues({ ...selectedRow, information: newInfoArr });
+    const newValues = { ...values!, information: newInfoArr, newInfo: {} as IInformation } as IData;
+    // delete newValues.newInfo;
+    setValues(newValues);
+    setSelectedRowValues(newValues);
     setEnableReinitialize(false);
   };
 
   const handleInfoFormCancel = () => {
     setInfoFormModalVisible(false);
-    setEnableReinitialize(true);
-    resetForm();
+    // setEnableReinitialize(true);
   };
 
   const handleInfoFormOk = () => {
@@ -87,6 +88,7 @@ export default function InfoTable({
         columns={columns}
       />
       <InfoFormModal
+        values={values}
         selectedInfoIdx={selectedInfoIdx}
         infoFormModalVisible={infoFormModalVisible}
         handleInfoFormOk={handleInfoFormOk}

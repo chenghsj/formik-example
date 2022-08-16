@@ -40,6 +40,7 @@ export const dataSlice = createSlice({
     updateRowDataAction: (state, action: PayloadAction<{ rowId: string, rowData: IData }>) => {
       const filteredRowIdx = filteredIdx(state, action.payload.rowId);
       state[filteredRowIdx] = action.payload.rowData;
+      delete state[filteredRowIdx].newInfo;
     },
     resetData: (state, action: PayloadAction<{ rowId: string, untouchedValues: IData }>) => {
       const filteredRowIdx = filteredIdx(state, action.payload.rowId);
