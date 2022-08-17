@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import InfoFields from './formFields/InfoFields';
 import { FormikProps } from 'formik';
 
-export type IInfoFormModalProps = {
+export type InfoFormModalProps = {
     infoFormModalVisible: boolean;
     selectedInfoIdx: number;
     handleInfoFormOk: () => void;
@@ -20,9 +20,9 @@ export function InfoFormModal({
     infoFormModalVisible,
     selectedInfoIdx,
     ...props
-}: IInfoFormModalProps) {
+}: InfoFormModalProps) {
     const disabledOkButton = !dirty || Object.keys(errors).length > 0;
-    console.log(selectedInfoIdx);
+
     return (
         <Modal
             title={`${selectedInfoIdx < 0 ? "Add " : "Edit "}Information`}
@@ -33,7 +33,13 @@ export function InfoFormModal({
             onOk={handleInfoFormOk}
             onCancel={handleInfoFormCancel}
         >
-            <InfoFields selectedInfoIdx={selectedInfoIdx} />
+            <InfoFields
+                errors={errors} 
+                touched={touched} 
+                dirty={dirty} 
+                values={values}
+                selectedInfoIdx={selectedInfoIdx}
+                {...props} />
         </Modal>
     );
 }

@@ -7,7 +7,9 @@ type CreateAntFieldProps = {
   hasFeedback: boolean;
   label: string;
   type: string;
-  selectOptions: any[];
+  disabled: boolean;
+  selectOptions: string[];
+  disabledOptions: string[];
   style: React.CSSProperties;
   selectedInfoIdx: number;
   min: number;
@@ -19,9 +21,11 @@ const CreateAntField = (AntComponent: any) => ({
   form,
   hasFeedback,
   label,
-  type,
-  selectOptions,
   style,
+  type,
+  disabled,
+  selectOptions,
+  disabledOptions,
   selectedInfoIdx,
   min,
   max,
@@ -48,7 +52,6 @@ const CreateAntField = (AntComponent: any) => ({
   };
 
   const onBlur = () => form.setFieldTouched(field.name, true);
-
   return (
     <div className="field-container">
       <Form.Item
@@ -66,9 +69,17 @@ const CreateAntField = (AntComponent: any) => ({
           {...props}
           onBlur={onBlur}
           onChange={type ? onInputChange : onChange}
+          disabled={disabled}
         >
           {selectOptions &&
-            selectOptions.map((name: string) => <Select.Option key={name}>{name}</Select.Option>)}
+            selectOptions.map((name: string) =>
+              <Select.Option
+                disabled={disabledOptions?.includes(name)}
+                key={name}
+              >
+                {name}
+              </Select.Option>
+            )}
         </AntComponent>
       </Form.Item>
     </div>

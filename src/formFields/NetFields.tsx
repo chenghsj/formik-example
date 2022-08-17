@@ -6,7 +6,7 @@ type Props = {};
 
 export default function NetFields({ }: Props) {
   return (
-    <React.Fragment>
+    <div style={{width: "50%"}}>
       <Field
         component={AntInput}
         name="ip_address"
@@ -25,6 +25,6 @@ export default function NetFields({ }: Props) {
         type="domain_name"
         label="Domain Name"
       />
-    </React.Fragment>
+    </div>
   );
 }

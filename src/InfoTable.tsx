@@ -5,10 +5,10 @@ import { Formik, FormikProps } from 'formik';
 import { IData, IInformation } from './reduxSlice/dataSlice';
 import { InfoFormModal } from './InfoFormModal';
 import { validationSchema } from './validationSchema/validationSchema';
+import EditInfoForm from './components/EditInfoForm';
 
 
 type Props = {
-  setEnableReinitialize: (bool: boolean) => void;
 } & FormikProps<IData>;
 
 export default function InfoTable({
@@ -19,13 +19,12 @@ export default function InfoTable({
   handleSubmit,
   resetForm,
   setValues,
-  setEnableReinitialize,
   ...props
 }: Props) {
-  const [infoFormModalVisible, setInfoFormModalVisible] = useState<boolean>(false);
   const [selectedInfoIdx, setSelectedInfoIdx] = useState<number>(0);
   const editInfoRef = useRef<any>(null);
-  console.log(values);
+  const editInfoFormModalRef = useRef<any>(null);
+
   const actionMenu = (record: IInformation, index: number) => {
     const actionMenuItems = [
       { key: "edit", label: "Edit", onClick: handleEditClick(record, index) },
@@ -43,6 +42,9 @@ export default function InfoTable({
     },
     { title: "Age", dataIndex: "age", key: 'age' },
     { title: "Email", dataIndex: "email", key: 'email' },
+    {title: "Income Source", dataIndex: "income_source", key: "income_source"},
+    {title: "Job Title", dataIndex: "job_title", key: "job_title"},
+    {title: "Company", dataIndex: "company", key: "company"},
     {
       title: "Action",
       dataIndex: 'action',
@@ -56,9 +58,7 @@ export default function InfoTable({
   ];
 
   const handleEditClick = (record: IInformation, index: number) => () => {
-    console.log('clicked');
-    setInfoFormModalVisible(true);
-    setEnableReinitialize(false);
+    editInfoFormModalRef.current.setEditInfoFormModalVisible(true);
     setSelectedInfoIdx(index);
   };
 
@@ -68,16 +68,6 @@ export default function InfoTable({
     setValues(newValues);
   };
 
-  const handleInfoFormCancel = () => {
-    setInfoFormModalVisible(false);
-    editInfoRef.current.setValues(values);
-  };
-
-  const handleInfoFormOk = () => {
-    setInfoFormModalVisible(false);
-    setValues(editInfoRef.current.values);
-  };
-
   return (
     <React.Fragment>
       <Table
@@ -85,25 +75,16 @@ export default function InfoTable({
         rowKey={(record: IInformation) => record.id}
         columns={columns}
       />
-      <Formik
-        innerRef={editInfoRef}
-        enableReinitialize
-        initialValues={values}
-        validationSchema={validationSchema.pick(['information'])}
-        onSubmit={() => { }}
-        component={(props: FormikProps<IData>) => {
-          return (
-            <InfoFormModal
-              selectedInfoIdx={selectedInfoIdx}
-              infoFormModalVisible={infoFormModalVisible}
-              handleInfoFormOk={handleInfoFormOk}
-              handleInfoFormCancel={handleInfoFormCancel}
-              {...props}
-            />
-          );
-        }}
-      />
-
+      <EditInfoForm
+        ref={editInfoFormModalRef}
+        resetForm={resetForm}
+        editInfoRef={editInfoRef}
+        values={values}
+        errors={errors}
+        touched={touched}
+        setValues={setValues}
+        selectedInfoIdx={selectedInfoIdx}
+        {...props} />
     </React.Fragment>
   );
 }

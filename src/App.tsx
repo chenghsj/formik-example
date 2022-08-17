@@ -9,7 +9,7 @@ import './App.css';
 import InfoTable from './InfoTable';
 import NetFields from './formFields/NetFields';
 import { useDispatch } from 'react-redux';
-import { NewInfoForm } from './components/NewInfoForm';
+import NewInfoForm from './components/NewInfoForm';
 import { validationSchema } from './validationSchema/validationSchema';
 
 function App() {
@@ -17,29 +17,25 @@ function App() {
   const dispatch = useDispatch();
   const [selectedRowNum, setSelectedRowNum] = useState(1);
   const [initialValues, setInitialValues] = useState({} as IData);
-  const [enableReinitialize, setEnableReinitialize] = useState(true);
-  const [addInfoFomModalVisible, setAddInfoFomModalVisible] = useState(false);
   const formikRef = useRef<any>(null);
   const newInfoRef = useRef<any>(null);
+  const addInfoModalRef = useRef<any>(null)
 
   const handleAddInfoBtnClick = () => {
-    setAddInfoFomModalVisible(true);
+    addInfoModalRef.current.setAddInfoFomModalVisible(true);
     newInfoRef.current.resetForm();
   };
 
   const handleSelectChange = (value: number) => {
     setSelectedRowNum(value);
-    setEnableReinitialize(true);
   };
 
   const handleCancel = (setValues: (value: IData) => void) => () => {
     setValues(formikRef.current.initialValues);
-    setEnableReinitialize(true);
     setInitialValues(formikRef.current.initialValues);
   };
 
   const handleSubmit = (values: IData) => {
-    setEnableReinitialize(true);
     alert(JSON.stringify(values, null, 2));
     dispatch(updateRowDataAction({ rowId: initialValues.id, rowData: values as IData }));
   };
@@ -58,13 +54,17 @@ function App() {
           defaultValue={1}
           onChange={handleSelectChange}>
           {data.map(item => (
-            <Select.Option key={item.id} value={item.row}>{item.row}</Select.Option>
+            <Select.Option
+              key={item.id}
+              value={item.row}>
+              {item.row}
+            </Select.Option>
           ))}
         </Select>
       </Row>
       <Formik
         innerRef={formikRef}
-        enableReinitialize={enableReinitialize}
+        enableReinitialize
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -76,7 +76,7 @@ function App() {
             <>
               <Form
                 onSubmit={handleSubmit}
-                style={{ margin: '0 auto', width: "500px" }}>
+                style={{ margin: '0 auto', width: "50vw" }}>
                 <NetFields />
                 <Row justify='end'>
                   <Button onClick={handleAddInfoBtnClick}>
@@ -84,7 +84,6 @@ function App() {
                   </Button>
                 </Row>
                 <InfoTable
-                  setEnableReinitialize={setEnableReinitialize}
                   {...props}
                 />
                 <Row>
@@ -110,12 +109,9 @@ function App() {
       >
       </Formik>
       <NewInfoForm
+        ref={addInfoModalRef}
         formikRef={formikRef}
         newInfoRef={newInfoRef}
-        enableReinitialize={enableReinitialize}
-        addInfoFomModalVisible={addInfoFomModalVisible}
-        setAddInfoFomModalVisible={setAddInfoFomModalVisible}
-        setEnableReinitialize={setEnableReinitialize}
       />
     </div >
   );

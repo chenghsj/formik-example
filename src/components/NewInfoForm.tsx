@@ -1,5 +1,5 @@
 import { Formik, FormikProps } from 'formik';
-import { useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import * as uuid from 'uuid';
 import { InfoFormModal } from '../InfoFormModal';
 import { IInformation } from '../reduxSlice/dataSlice';
@@ -8,21 +8,14 @@ import { validationInfoSchema } from '../validationSchema/validationSchema';
 export interface INewInfoFormProps {
     formikRef: any;
     newInfoRef: any;
-    enableReinitialize: boolean;
-    addInfoFomModalVisible: boolean;
-    setAddInfoFomModalVisible: (bool: boolean) => void;
-    setEnableReinitialize: (bool: boolean) => void;
 }
 
-export function NewInfoForm({
+export default forwardRef(function NewInfoForm({
     formikRef,
     newInfoRef,
-    enableReinitialize,
-    addInfoFomModalVisible,
-    setAddInfoFomModalVisible,
-    setEnableReinitialize,
     ...props
-}: INewInfoFormProps) {
+}: INewInfoFormProps, ref) {
+    const [addInfoFomModalVisible, setAddInfoFomModalVisible] = useState(false);
     const handleAddInfoFormOk = (values: IInformation) => () => {
         setAddInfoFomModalVisible(false);
         const newInfo: IInformation = { ...values, id: uuid.v4() };
@@ -30,7 +23,6 @@ export function NewInfoForm({
             ...formikRef.current.values,
             information: formikRef.current.values.information.concat(newInfo)
         });
-        setEnableReinitialize(false);
     };
 
     const handleAddInfoFormCancel = () => {
@@ -38,10 +30,13 @@ export function NewInfoForm({
         newInfoRef.current.resetForm();
     };
 
+    useImperativeHandle(ref, () => ({
+        setAddInfoFomModalVisible
+    }))
+
     return (
         <Formik
             innerRef={newInfoRef}
-            enableReinitialize={enableReinitialize}
             initialValues={{} as IInformation}
             validationSchema={validationInfoSchema}
             onSubmit={() => { }}
@@ -59,4 +54,4 @@ export function NewInfoForm({
             }}
         />
     );
-}
+})

@@ -7,6 +7,9 @@ export interface IInformation {
   first_name: string;
   last_name: string;
   email: string;
+  job_title?: string;
+  company?: string;
+  income_source?: string;
 }
 
 export interface IData {

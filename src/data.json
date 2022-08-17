@@ -10,7 +10,10 @@
       "age": 61,
       "first_name": "Elaina",
       "last_name": "Beszant",
-      "email": "ebeszant0@reverbnation.com"
+      "email": "ebeszant0@reverbnation.com",
+      "income_source": "Salary",
+      "job_title": "Information Security",
+      "company": "SSS"
     }
   ]
 }, {
@@ -25,21 +28,30 @@
       "age": 7,
       "first_name": "Terrell",
       "last_name": "Bromhead",
-      "email": "tbromhead0@gov.uk"
+      "email": "tbromhead0@gov.uk",
+      "income_source": "Salary",
+      "job_title": "UI Developer",
+      "company": "WWW"
     },
     {
       "id": "cc1177be-cd95-4040-a031-06827edc3f22",
       "age": 48,
       "first_name": "Osborn",
       "last_name": "Goch",
-      "email": "ogoch1@reverbnation.com"
+      "email": "ogoch1@reverbnation.com",
+      "income_source": "Salary",
+      "job_title": "",
+      "company": ""
     },
     {
       "id": "14dddcc5-bdf5-480b-a7bd-7c827467c068",
       "age": 41,
       "first_name": "Gisele",
       "last_name": "Tubble",
-      "email": "gtubble2@pbs.org"
+      "email": "gtubble2@pbs.org",
+      "income_source": "Salary",
+      "job_title": "Web Designer",
+      "company": "DDD"
     }
   ]
 }, {
@@ -54,7 +66,10 @@
       "age": 52,
       "first_name": "Reina",
       "last_name": "Reims",
-      "email": "rreims0@netscape.com"
+      "email": "rreims0@netscape.com",
+      "income_source": "Salary",
+      "job_title": "Computer Programmer",
+      "company": "ZZZ"
     }
   ]
 }]
