@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal } from 'antd';
-import InfoFields from './formFields/InfoFields';
+import InfoFields from './components/formFields/InfoFields';
 import { FormikProps } from 'formik';
 
 export type InfoFormModalProps = {
@@ -34,9 +34,9 @@ export function InfoFormModal({
             onCancel={handleInfoFormCancel}
         >
             <InfoFields
-                errors={errors} 
-                touched={touched} 
-                dirty={dirty} 
+                errors={errors}
+                touched={touched}
+                dirty={dirty}
                 values={values}
                 selectedInfoIdx={selectedInfoIdx}
                 {...props} />

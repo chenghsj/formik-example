@@ -1,8 +1,8 @@
 import React from 'react';
 import { Field, FormikProps } from 'formik';
-import { AntInput, AntInputNumber, AntSelect } from '../CreateAntFields';
-import { IData, IInformation } from '../reduxSlice/dataSlice';
-import { info } from 'console';
+import { AntInput, AntInputNumber, AntSelect } from '../../CreateAntFields';
+import { IData, IInformation } from '../../reduxSlice/dataSlice';
+import { source_type } from '../../validationSchema/validationSchema';
 
 type Props = {
   selectedInfoIdx: number;
@@ -11,9 +11,11 @@ type Props = {
 export default function InfoFields({
   selectedInfoIdx,
   values,
-  errors
+  errors,
+  setFieldValue
 }: Props) {
   let fieldName = {} as IInformation
+  const { Salary, Pension, Allowance } = source_type;
   const fieldNameArr = [
     "age",
     "email",
@@ -32,11 +34,18 @@ export default function InfoFields({
 
   const infoValues = selectedInfoIdx < 0 ? values as IInformation : (values as IData).information[selectedInfoIdx]
 
-  const isChildren = infoValues.age < 18;
-  const isAdult = infoValues.age >= 18 && infoValues.age <= 65
-  const isElder = infoValues.age > 65;
-  const isRetired = infoValues.income_source === "Pension"
-  const isWorking = infoValues.income_source === "Salary"
+  const isChildren = infoValues?.age < 18;
+  const isAdult = infoValues?.age >= 18 && infoValues?.age <= 65
+  const isElder = infoValues?.age > 65;
+  const isRetired = infoValues?.income_source === Pension
+  const isWorking = infoValues?.income_source === Salary
+
+  // console.log(errors);
+  const disabledIncomeSource = () => {
+    if (isChildren) return [Salary, Pension]
+    else if (isElder) return [Allowance, Salary]
+    else return [Allowance, Pension]
+  }
 
   return (
     <React.Fragment>
@@ -47,6 +56,12 @@ export default function InfoFields({
         selectedInfoIdx={selectedInfoIdx}
         min={7}
         max={90}
+        resetValue={
+          isChildren && {
+            job_title: "",
+            company: ""
+          }
+        }
       />
       <Field
         component={AntInput}
@@ -55,33 +70,6 @@ export default function InfoFields({
         label="Email"
         selectedInfoIdx={selectedInfoIdx}
       />
-      <Field
-        component={AntSelect}
-        name={fieldName.income_source}
-        label="Main Income Source"
-        disabled={!infoValues.age}
-        selectedInfoIdx={selectedInfoIdx}
-        selectOptions={["", "Allowance", "Salary", "Pension"]}
-        disabledOptions={isChildren ? ["Salary", "Pension"] : ["Allowance"]}
-      />
-      {isWorking &&
-        <>
-          <Field
-            component={AntSelect}
-            name={fieldName.job_title}
-            label="Job Title"
-            selectedInfoIdx={selectedInfoIdx}
-            selectOptions={Object.keys(jobTitle)}
-          />
-          <Field
-            component={AntInput}
-            name={fieldName.company}
-            type="company"
-            label="Company"
-            selectedInfoIdx={selectedInfoIdx}
-          />
-        </>
-      }
       <Field
         component={AntInput}
         name={fieldName.first_name}
@@ -96,11 +84,37 @@ export default function InfoFields({
         label="Last Name"
         selectedInfoIdx={selectedInfoIdx}
       />
+      <Field
+        component={AntSelect}
+        name={fieldName.income_source}
+        label="Main Income Source"
+        disabled={!infoValues.age}
+        selectedInfoIdx={selectedInfoIdx}
+        selectOptions={["", Allowance, Salary, Pension]}
+        disabledOptions={disabledIncomeSource()}
+      />
+      <Field
+        component={AntSelect}
+        name={fieldName.job_title}
+        label="Job Title"
+        selectedInfoIdx={selectedInfoIdx}
+        selectOptions={Object.values(jobTitle)}
+        disabled={!isWorking}
+      />
+      <Field
+        component={AntInput}
+        name={fieldName.company}
+        type="company"
+        label="Company"
+        selectedInfoIdx={selectedInfoIdx}
+        disabled={!isWorking}
+      />
     </React.Fragment>
   );
 }
 
 enum jobTitle {
+  None = "",
   Computer_Scientist = "Computer Scientest",
   IT_Professional = "IT Professional",
   UX_Designer = "UX Designer",

@@ -1,31 +1,33 @@
 import { Formik, FormikHelpers, FormikProps, FormikState } from 'formik';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { InfoFormModal } from '../InfoFormModal';
 import { IData } from '../reduxSlice/dataSlice';
 import { validationSchema } from '../validationSchema/validationSchema';
+import { trimObj } from './AddInfoForm';
 
 export type EditInfoFormProps = {
+    editInfoRef: RefObject<FormikProps<IData>>;
+    formikRef: RefObject<FormikProps<IData>>;
     selectedInfoIdx: number;
-    editInfoRef: any;
-} & FormikState<any> & FormikHelpers<any>
+}
 
 export default forwardRef(function EditInfoForm({
-    values,
-    setValues,
-    selectedInfoIdx,
+    formikRef,
     editInfoRef,
+    selectedInfoIdx,
     ...props
 }: EditInfoFormProps, ref) {
     const [editInfoFormModalVisible, setEditInfoFormModalVisible] = useState<boolean>(false);
-    
+
     const handleInfoFormCancel = () => {
         setEditInfoFormModalVisible(false);
-        editInfoRef.current.resetForm();
+        editInfoRef.current!.resetForm();
     };
 
     const handleInfoFormOk = (editedValues: IData) => () => {
         setEditInfoFormModalVisible(false);
-        setValues(editedValues);
+        editInfoRef.current!.setValues(trimObj(editedValues));
+        formikRef.current!.setValues(trimObj(editedValues));
     };
 
     useImperativeHandle(ref, () => ({
@@ -36,7 +38,7 @@ export default forwardRef(function EditInfoForm({
         <Formik
             innerRef={editInfoRef}
             enableReinitialize
-            initialValues={values}
+            initialValues={formikRef.current?.values as IData}
             validationSchema={validationSchema.pick(['information'])}
             onSubmit={() => { }}
             component={(props: FormikProps<IData>) => {

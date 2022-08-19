@@ -1,6 +1,6 @@
-import { Field } from 'formik';
 import React from 'react';
-import { AntInput } from '../CreateAntFields';
+import { Field } from 'formik';
+import { AntInput } from '../../CreateAntFields';
 
 type Props = {};
 

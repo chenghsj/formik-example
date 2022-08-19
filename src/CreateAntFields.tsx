@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Form, Input, Select, InputNumber } from "antd";
-import { FormikProps, FieldProps, FormikTouched, FormikErrors } from 'formik';
+import { FormikProps, FieldProps } from 'formik';
 import { IData, IInformation } from "./reduxSlice/dataSlice";
 
 type CreateAntFieldProps = {
@@ -14,7 +14,8 @@ type CreateAntFieldProps = {
   selectedInfoIdx: number;
   min: number;
   max: number;
-} & FormikProps<IData | IInformation> & FieldProps;
+  resetValue: any;
+} & FieldProps;
 
 const CreateAntField = (AntComponent: any) => ({
   field,
@@ -29,11 +30,24 @@ const CreateAntField = (AntComponent: any) => ({
   selectedInfoIdx,
   min,
   max,
+  resetValue,
   ...props
 }: CreateAntFieldProps) => {
   let touched: any;
   let hasError: any;
   const fieldName = field.name.split('.')[1];
+
+  const resetValueFn = () => {
+    if (resetValue) {
+      for (let key in resetValue) {
+        if (selectedInfoIdx >= 0) {
+          form.setFieldValue(`information[${selectedInfoIdx}][${key}]`, resetValue[key])
+        } else {
+          form.setFieldValue(key, resetValue[key])
+        }
+      }
+    }
+  }
 
   if (selectedInfoIdx >= 0 && form.touched.information && form.errors.information) {
     touched = (form.touched.information as any)[selectedInfoIdx][fieldName];
@@ -44,14 +58,18 @@ const CreateAntField = (AntComponent: any) => ({
   }
 
   const touchedError = hasError && touched;
-  const onInputChange = ({ target: { value } }: any) => {
+  const handleInputChange = ({ target: { value } }: any) => {
     form.setFieldValue(field.name, value);
   };
-  const onChange = (value: any) => {
-    form.setFieldValue(field.name, value);
+  const handleSelectChange = (value: any) => {
+    resetValueFn();
+    form.setFieldValue(field.name, value)
   };
 
-  const onBlur = () => form.setFieldTouched(field.name, true);
+  const handleBlur = () => {
+    resetValueFn();
+    form.setFieldTouched(field.name, true)
+  };
   return (
     <div className="field-container">
       <Form.Item
@@ -67,8 +85,8 @@ const CreateAntField = (AntComponent: any) => ({
           suffix={<span />}
           {...field}
           {...props}
-          onBlur={onBlur}
-          onChange={type ? onInputChange : onChange}
+          onBlur={handleBlur}
+          onChange={type ? handleInputChange : handleSelectChange}
           disabled={disabled}
         >
           {selectOptions &&
